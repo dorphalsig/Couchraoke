@@ -4,6 +4,7 @@
 *.log
 *.pyc
 *.swp
+*.wav
 .buildlog/
 .history
 
