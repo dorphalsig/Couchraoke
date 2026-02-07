@@ -9,6 +9,12 @@
 .history
 
 
+#Rust
+**/*.rs.bk
+# FRB Generated files (Optional to ignore)
+/lib/src/rust/frb_generated.dart
+/lib/src/rust/frb_generated.io.dart
+/lib/src/rust/frb_generated.web.dart
 
 # Flutter repo-specific
 /bin/cache/
