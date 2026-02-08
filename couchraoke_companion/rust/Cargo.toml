@@ -1,0 +1,18 @@
+[package]
+name = "pyin_rs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+anyhow = "=1.0.95"
+flutter_rust_bridge = "=2.11.1"
+log = "=0.4.22"
+rustfft = "6.2.0"
+env_logger = "0.11.6"
+
+[dev-dependencies]
+hound = "=3.5.1"
+rand = "0.8.5"
