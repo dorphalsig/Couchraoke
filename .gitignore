@@ -1,16 +1,32 @@
 # Miscellaneous
 *.class
 *.lock
+!**/Cargo.lock
 *.log
 *.pyc
 *.swp
 *.wav
+*.a
+*.dll
+*.dylib
+*.exe
+*.gif
+*.ico
+*.jar
+*.jpeg
+*.jpg
+*.o
+*.obj
+*.png
+*.so
+*.webp
 .buildlog/
 .history
 
 
 #Rust
 **/*.rs.bk
+**/rust/target/
 # FRB Generated files (Optional to ignore)
 /lib/src/rust/frb_generated.dart
 /lib/src/rust/frb_generated.io.dart
