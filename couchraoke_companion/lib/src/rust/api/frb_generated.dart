@@ -5,6 +5,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'fingerprint.dart';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
@@ -65,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -1877426662;
+  int get rustContentHash => 66788347;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -92,6 +93,10 @@ abstract class RustLibApi extends BaseApi {
   Future<Uint8List> cratePyinApiAudioAnalyzerProcessChunkCollect({
     required AudioAnalyzer that,
     required List<int> pcm16LeBytes,
+  });
+
+  Future<List<AudioFingerprint>> crateFingerprintGetBatchFingerprints({
+    required List<String> paths,
   });
 
   Future<void> cratePyinApiInitLogging();
@@ -283,6 +288,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<AudioFingerprint>> crateFingerprintGetBatchFingerprints({
+    required List<String> paths,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_list_String(paths, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 5,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_list_audio_fingerprint,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateFingerprintGetBatchFingerprintsConstMeta,
+        argValues: [paths],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateFingerprintGetBatchFingerprintsConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_batch_fingerprints",
+        argNames: ["paths"],
+      );
+
+  @override
   Future<void> cratePyinApiInitLogging() {
     return handler.executeNormal(
       NormalTask(
@@ -291,7 +329,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 5,
+            funcId: 6,
             port: port_,
           );
         },
@@ -325,7 +363,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 6,
+            funcId: 7,
             port: port_,
           );
         },
@@ -363,7 +401,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 7,
+            funcId: 8,
             port: port_,
           );
         },
@@ -472,9 +510,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AudioFingerprint dco_decode_audio_fingerprint(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return AudioFingerprint(
+      path: dco_decode_String(arr[0]),
+      fingerprint: dco_decode_String(arr[1]),
+      durationSecs: dco_decode_f_64(arr[2]),
+    );
+  }
+
+  @protected
   PitchConfig dco_decode_box_autoadd_pitch_config(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_pitch_config(raw);
+  }
+
+  @protected
+  double dco_decode_f_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as double;
+  }
+
+  @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
+  List<AudioFingerprint> dco_decode_list_audio_fingerprint(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_audio_fingerprint).toList();
   }
 
   @protected
@@ -638,11 +707,56 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AudioFingerprint sse_decode_audio_fingerprint(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_path = sse_decode_String(deserializer);
+    var var_fingerprint = sse_decode_String(deserializer);
+    var var_durationSecs = sse_decode_f_64(deserializer);
+    return AudioFingerprint(
+      path: var_path,
+      fingerprint: var_fingerprint,
+      durationSecs: var_durationSecs,
+    );
+  }
+
+  @protected
   PitchConfig sse_decode_box_autoadd_pitch_config(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_pitch_config(deserializer));
+  }
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getFloat64();
+  }
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<AudioFingerprint> sse_decode_list_audio_fingerprint(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <AudioFingerprint>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_audio_fingerprint(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -838,12 +952,50 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_audio_fingerprint(
+    AudioFingerprint self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.path, serializer);
+    sse_encode_String(self.fingerprint, serializer);
+    sse_encode_f_64(self.durationSecs, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_pitch_config(
     PitchConfig self,
     SseSerializer serializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_pitch_config(self, serializer);
+  }
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putFloat64(self);
+  }
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_audio_fingerprint(
+    List<AudioFingerprint> self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_audio_fingerprint(item, serializer);
+    }
   }
 
   @protected
