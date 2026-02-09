@@ -8,10 +8,14 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 anyhow = "=1.0.95"
+base64 = "0.22.1"
 flutter_rust_bridge = "=2.11.1"
 log = "=0.4.22"
 rustfft = "6.2.0"
 env_logger = "0.11.6"
+rayon = "1.10.0"
+rusty-chromaprint = "0.3.0"
+symphonia = { version = "0.5.3", features = ["mp3", "ogg", "pcm", "isomp4"] }
 
 [dev-dependencies]
 hound = "=3.5.1"

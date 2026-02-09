@@ -281,6 +281,7 @@ fn parse_pcm16le_bytes(proc: &mut PyinProcessor, bytes: &[u8]) {
 
 #[cfg(test)]
 mod tests {
+    use crate::pyin::midi;
     use super::*;
 
     #[test]
@@ -297,8 +298,8 @@ mod tests {
 
     #[test]
     fn midi_conversion_values_via_public_helper() {
-        assert_eq!(super::midi::midi_from_hz(220.0), 57);
-        assert_eq!(super::midi::midi_from_hz(440.0), 69);
-        assert_eq!(super::midi::midi_from_hz(1046.50), 84);
+        assert_eq!(midi::midi_from_hz(220.0), 57);
+        assert_eq!(midi::midi_from_hz(440.0), 69);
+        assert_eq!(midi::midi_from_hz(1046.50), 84);
     }
 }
